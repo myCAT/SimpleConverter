@@ -22,16 +22,15 @@
 package org.olanto.converter;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.OfficeException;
 import org.artofsolving.jodconverter.office.OfficeManager;
-import org.artofsolving.jodconverter.process.MacProcessManager;
+import org.artofsolving.jodconverter.process.LinuxProcessManager;
 import org.artofsolving.jodconverter.process.ProcessManager;
+import org.artofsolving.jodconverter.process.ProcessQuery;
 import org.artofsolving.jodconverter.process.PureJavaProcessManager;
-import org.artofsolving.jodconverter.process.UnixProcessManager;
-import org.artofsolving.jodconverter.process.WindowsProcessManager;
+import org.artofsolving.jodconverter.process.SigarProcessManager;
 import org.artofsolving.jodconverter.util.PlatformUtils;
 
 /**
@@ -74,7 +73,6 @@ public abstract class ConverterFactoryOffice extends AbstractConverterFactory {
     }
 
     public static void close() {
-        String processRegex = "";
         try {
             if (officeManager != null) {
                 officeManager.stop();
@@ -82,24 +80,16 @@ public abstract class ConverterFactoryOffice extends AbstractConverterFactory {
         } catch (OfficeException e) {
             _logger.error(e.getMessage());
             ProcessManager process = new PureJavaProcessManager();
-            if (PlatformUtils.isWindows()) {
-                process = new WindowsProcessManager();
-                processRegex = "soffice.*" + Pattern.quote("socket,host=127.0.0.1,port=2002");
-                _logger.error(" CMD WINDOWS:" + processRegex);
-            } else if (PlatformUtils.isLinux()) {
-                process = new UnixProcessManager();
-                //             processRegex = "soffice.* --nologo --headless --nofirststartwizard" + Pattern.quote("socket,host=127.0.0.1,port=2002;urp;");
-                processRegex = "/usr/bin/soffice --nologo --nofirststartwizard --headless --norestore --invisible " + Pattern.quote("--accept=socket,host=localhost,port=2002,tcpNoDelay=1;urp;");
-                _logger.error(" CMD UNIX:" + processRegex);
-            } else if (PlatformUtils.isMac()) {
-                process = new MacProcessManager();
-                processRegex = "soffice.*" + Pattern.quote("socket,host=127.0.0.1,port=2002");
-                _logger.error(" CMD MAC:" + processRegex);
+            if (PlatformUtils.isLinux()) {
+                process = new LinuxProcessManager();
+                System.out.println("Linux Platform.");
+            } else {
+                process = new SigarProcessManager();
+                System.out.println("Non-Linux Platform.");
             }
-
-            // processRegex = "soffice.*" + Pattern.quote("socket,host=127.0.0.1,port=2002");
+            ProcessQuery query = new ProcessQuery("soffice.*", "socket,host=127.0.0.1,port=2002");
             try {
-                String pid = process.findPid(processRegex);
+                Long pid = process.findPid(query);
                 _logger.info("Trying to kill soffice process: " + pid);
                 process.kill(null, pid);
 
@@ -110,6 +100,7 @@ public abstract class ConverterFactoryOffice extends AbstractConverterFactory {
             officeManager = null;
         }
     }
+
 
     @Override
     public abstract void startConvertion();
