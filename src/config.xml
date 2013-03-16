@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<converter>
+    <common>
+        <targetFormat>txt</targetFormat>
+        <badPath>C:/MYCAT/corpus/bad</badPath>
+        <docsPath>C:/MYCAT/corpus/docs</docsPath>
+        <sourcePath>C:/MYCAT/corpus/source</sourcePath>
+        <tempPath>C:/MYCAT/TEMP</tempPath>
+    </common> 
+    <plugins>
+        <plugin>
+            <plugName>antiword</plugName>
+            <plugCommand>C:/prog/antiword.exe %source% %target%</plugCommand>
+            <plugProcessWindows>antiword.exe</plugProcessWindows>
+            <plugProcessWindows>....</plugProcessWindows>
+            ... autres paramètres nécessaires pour activer et tuer la tâche .....     
+        </plugin>
+        <plugin>
+            <plugName>pdf2txt</plugName>
+            <plugCommand>C:/prog/pdf2txt.exe -u -! x -z %source% %target%</plugCommand>
+            <plugProcessWindows>pdf2txt.exe</plugProcessWindows>
+            <plugProcessWindows>....</plugProcessWindows>
+            ... autres paramètres nécessaires pour activer et tuer la tâche .....     
+        </plugin>
+        <plugin>
+            <plugName>superconverter</plugName>
+            <plugCommand>C:/prog/sc.exe -u -x -z %source% %target%</plugCommand>
+            <plugProcessWindows>sc.exe</plugProcessWindows>
+            <plugProcessWindows>....</plugProcessWindows>
+        </plugin>
+        <maps>
+            <ext>
+                <extName>.doc</extName>
+                <conv>antiword</conv>
+                <conv>superconverter</conv>
+                <builtin>no</builtin>
+            </ext>
+            <ext>
+                <extName>.pdf</extName>
+                <conv>pdf2txt</conv>
+                <builtin>yes</builtin>
+            </ext>
+            <maps>
+    </plugins>
+</converter>
