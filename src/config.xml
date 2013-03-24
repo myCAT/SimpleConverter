@@ -3,9 +3,11 @@
     <common>
         <targetFormat>txt</targetFormat>
         <badPath>C:/MYCAT/corpus/bad</badPath>
-        <docsPath>C:/MYCAT/corpus/docs</docsPath>
+        <docPath>C:/MYCAT/corpus/docs</docPath>
         <sourcePath>C:/MYCAT/corpus/source</sourcePath>
-        <tempPath>C:/MYCAT/TEMP</tempPath>
+        <tempPath>C:/MYCAT/temp</tempPath>
+        <maxRetry>3</maxRetry>
+        <keepExtension>true</keepExtension>
     </common> 
     <plugins>
         <plugin>
@@ -13,14 +15,14 @@
             <plugCommand>C:/prog/antiword.exe %source% %target%</plugCommand>
             <plugProcessWindows>antiword.exe</plugProcessWindows>
             <plugProcessWindows>....</plugProcessWindows>
-            ... autres paramètres nécessaires pour activer et tuer la tâche .....     
+            <plugProcessWindows>... autres paramètres nécessaires pour activer et tuer la tâche ..... </plugProcessWindows>            
         </plugin>
         <plugin>
             <plugName>pdf2txt</plugName>
             <plugCommand>C:/prog/pdf2txt.exe -u -! x -z %source% %target%</plugCommand>
             <plugProcessWindows>pdf2txt.exe</plugProcessWindows>
-            <plugProcessWindows>....</plugProcessWindows>
-            ... autres paramètres nécessaires pour activer et tuer la tâche .....     
+            <plugProcessWindows>... autres paramètres nécessaires pour activer et tuer la tâche ..... </plugProcessWindows>
+                
         </plugin>
         <plugin>
             <plugName>superconverter</plugName>
@@ -40,6 +42,6 @@
                 <conv>pdf2txt</conv>
                 <builtin>yes</builtin>
             </ext>
-            <maps>
+        </maps>
     </plugins>
 </converter>
