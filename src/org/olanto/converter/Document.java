@@ -179,4 +179,8 @@ public class Document extends File {
             }
         }
     }
+
+    Object getDocumentElement() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
