@@ -34,8 +34,9 @@ public class ConverterControler {
     // default value
     private String outputFormat = Constants.TXT;
     // default value
-    private int iMaxRetry = ConfigUtil.maxRetry;
-
+    private int iMaxRetry = 2;
+    private boolean usePlugin = false;
+    
     public static ConverterControler getInstance() {
         _logger.debug("Build new Converter");
         return new ConverterControler();
@@ -51,41 +52,47 @@ public class ConverterControler {
         _logger.debug("Init converter with file extention: " + source.getExtention());
         Document newTarget = new Document(target.getAbsolutePath());
 
-        if (ConfigUtil.mapping.containsKey(source.getExtention()) && numberOfRetry < iMaxRetry) {
-            if (ConfigUtil.mapping.get(source.getExtention()).size() > 0) {
+        if (ConfigUtil.hasPluginForExtension(source.getExtention())) {
+            if (numberOfRetry < iMaxRetry) {
+                usePlugin = true;
                 converterFactory = PluginConverterFactory.getInstance();
+            } else if (ConfigUtil.applyBuiltin(source.getExtention())) {
+                usePlugin = false;
+                numberOfRetry=0;
             }
         }
-        if (source.getExtention().equalsIgnoreCase(Constants.PDF)) {
-            converterFactory = ConverterFactoryPDF.getInstance();
-        } else if (source.getExtention().equalsIgnoreCase(Constants.HTML)
-                || source.getExtention().equalsIgnoreCase(Constants.HTM)) {
-            converterFactory = ConverterFactoryHTM.getInstance();
-        } else if (source.getExtention().equalsIgnoreCase(Constants.DOCX) && numberOfRetry == 0
-                || source.getExtention().equalsIgnoreCase(Constants.DOC)
-                || source.getExtention().equalsIgnoreCase(Constants.RTF)
-                //|| source.getExtention().equalsIgnoreCase(Constants.TXT)
-                //            || source.getExtention().equalsIgnoreCase(Constants.HTML)
-                //            || source.getExtention().equalsIgnoreCase(Constants.HTM)
-                || source.getExtention().equalsIgnoreCase(Constants.ODT)
-                || source.getExtention().equalsIgnoreCase(Constants.WPD)
-                || source.getExtention().equalsIgnoreCase(Constants.WPF)) {
-            converterFactory = ConverterFactoryDOC.getInstance();
-        } else if (source.getExtention().equalsIgnoreCase(Constants.TXT)) {
-            converterFactory = ConverterFactoryTXT.getInstance();
-        } else if (source.getExtention().equalsIgnoreCase(Constants.DOCX) && numberOfRetry < iMaxRetry) {
-            converterFactory = ConverterFactoryDOCX4J.getInstance();
-        } else if (source.getExtention().equalsIgnoreCase(Constants.XLS)
-                || source.getExtention().equalsIgnoreCase(Constants.ODS)) {
-            converterFactory = ConverterFactorySpreadsheet.getInstance();
-            if (this.outputFormat.equalsIgnoreCase(Constants.TXT)) {
-                newTarget = target.replaceExtention(Constants.CSV);
+        if (!usePlugin) {
+            if (source.getExtention().equalsIgnoreCase(Constants.PDF)) {
+                converterFactory = ConverterFactoryPDF.getInstance();
+            } else if (source.getExtention().equalsIgnoreCase(Constants.HTML)
+                    || source.getExtention().equalsIgnoreCase(Constants.HTM)) {
+                converterFactory = ConverterFactoryHTM.getInstance();
+            } else if (source.getExtention().equalsIgnoreCase(Constants.DOCX) && numberOfRetry == 0
+                    || source.getExtention().equalsIgnoreCase(Constants.DOC)
+                    || source.getExtention().equalsIgnoreCase(Constants.RTF)
+                    //|| source.getExtention().equalsIgnoreCase(Constants.TXT)
+                    //            || source.getExtention().equalsIgnoreCase(Constants.HTML)
+                    //            || source.getExtention().equalsIgnoreCase(Constants.HTM)
+                    || source.getExtention().equalsIgnoreCase(Constants.ODT)
+                    || source.getExtention().equalsIgnoreCase(Constants.WPD)
+                    || source.getExtention().equalsIgnoreCase(Constants.WPF)) {
+                converterFactory = ConverterFactoryDOC.getInstance();
+            } else if (source.getExtention().equalsIgnoreCase(Constants.TXT)) {
+                converterFactory = ConverterFactoryTXT.getInstance();
+            } else if (source.getExtention().equalsIgnoreCase(Constants.DOCX) && numberOfRetry < iMaxRetry) {
+                converterFactory = ConverterFactoryDOCX4J.getInstance();
+            } else if (source.getExtention().equalsIgnoreCase(Constants.XLS)
+                    || source.getExtention().equalsIgnoreCase(Constants.ODS)) {
+                converterFactory = ConverterFactorySpreadsheet.getInstance();
+                if (this.outputFormat.equalsIgnoreCase(Constants.TXT)) {
+                    newTarget = target.replaceExtention(Constants.CSV);
+                }
+            } else if (source.getExtention().equalsIgnoreCase(Constants.PPT)
+                    || source.getExtention().equalsIgnoreCase(Constants.ODP)) {
+                converterFactory = ConverterFactoryPresentation.getInstance();
+            } else {
+                converterFactory = null;
             }
-        } else if (source.getExtention().equalsIgnoreCase(Constants.PPT)
-                || source.getExtention().equalsIgnoreCase(Constants.ODP)) {
-            converterFactory = ConverterFactoryPresentation.getInstance();
-        } else {
-            converterFactory = null;
         }
 
         if (converterFactory != null) {
@@ -120,5 +127,9 @@ public class ConverterControler {
 
     void setMaxRetry(int iMaxRetry) {
         this.iMaxRetry = iMaxRetry;
+    }
+    
+    public Boolean usePlugin(){
+        return this.usePlugin;
     }
 }

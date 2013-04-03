@@ -5,6 +5,7 @@ package org.olanto.converter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -12,18 +13,21 @@ import java.util.Date;
 public class SimpleConverterCLI {
 
     private static final int EXIT_CODE_TOO_FEW_ARGS = 255;
+    
+    private final static Logger _logger = Logger.getLogger(SimpleConverterCLI.class);
 
     public static void main(String[] arguments) throws Exception {
-
+        if (arguments.length < 1) {
+            System.out.println("Usage: SimpleConverterCLI config-file.xml \n");
+            System.exit(EXIT_CODE_TOO_FEW_ARGS);
+        } else {
+            ConfigUtil.setConfigFile(arguments[0]);
+        }
+        
         ConfigUtil.loadConfigFromXml();
-
-//        if (arguments.length < 1) {
-//            System.out.println("Usage: SimpleConverterCLI config-file \n");
-//            System.exit(EXIT_CODE_TOO_FEW_ARGS);
-//        }
-        Document inputFile = new Document(ConfigUtil.docPath);
-        Document outFile = new Document(ConfigUtil.sourcePath);
-        String badfilesPath = ConfigUtil.badPath;
+        Document inputFile = new Document(ConfigUtil.getDocPath());
+        Document outFile = new Document(ConfigUtil.getSourcePath());
+        String badfilesPath = ConfigUtil.getBadPath();
 
         outFile.mkdirs();
         SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm");
@@ -35,8 +39,8 @@ public class SimpleConverterCLI {
         ConverterReport.convertedFiles.info("Start time: " + dateStamp);
 
         SimpleConverterApplication converter = SimpleConverterApplication.getInstance();
-        converter.setMaxRetry(ConfigUtil.maxRetry);
-        converter.setOutputFormat(ConfigUtil.targetFormat);
+        converter.setMaxRetry(ConfigUtil.getMaxRetry());
+        converter.setOutputFormat(ConfigUtil.getTargetFormat());
         converter.convertObject(inputFile, outFile, badfilesPath);
 
         ConverterReport.statictics.info("------------------------------ Statistics --------------------------");

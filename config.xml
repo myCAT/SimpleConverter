@@ -6,14 +6,15 @@
         <docPath>C:/MYCAT/corpus/docs</docPath>
         <sourcePath>C:/MYCAT/corpus/source</sourcePath>
         <tempPath>C:/MYCAT/temp</tempPath>
-        <maxRetry>3</maxRetry>
+        <maxRetry>2</maxRetry>
         <keepExtension>true</keepExtension>
         <outputEncoding>UTF-8</outputEncoding>
     </common> 
     <plugins>
         <plugin>
             <plugName>antiword</plugName>
-            <plugCommand>C:/MYCAT/prog/antiword/antiword.exe %source% %target%</plugCommand>
+            <envVar name="ANTIWORDHOME">C:/MYCAT/prog/antiword</envVar>
+            <plugCommand>C:/MYCAT/prog/antiword/antiword.exe %source% >> %target%</plugCommand>
             <plugProcessWindows>antiword.exe</plugProcessWindows>
         </plugin>
         <plugin>
@@ -23,20 +24,20 @@
         </plugin>
         <plugin>
             <plugName>superconverter</plugName>
-            <plugCommand>C:/prog/sc.exe -u -x -z %source% %target%</plugCommand>
+            <plugCommand>C:/MYCAT/prog/sc.exe -u -x -z %source% %target%</plugCommand>
             <plugProcessWindows>sc.exe</plugProcessWindows>
         </plugin>
         <maps>
             <ext>
                 <extName>doc</extName>
                 <conv>antiword</conv>
-                <conv>superconverter</conv>
                 <builtin>no</builtin>
             </ext>
             <ext>
                 <extName>pdf</extName>
                 <conv>pdf2txt</conv>
-                <builtin>yes</builtin>
+                <conv>superconverter</conv>
+                <builtin>true</builtin>
             </ext>
         </maps>
     </plugins>

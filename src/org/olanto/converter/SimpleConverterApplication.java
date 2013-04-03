@@ -1,23 +1,24 @@
-/**********
-    Copyright © 2010-2012 Olanto Foundation Geneva
-
-   This file is part of myCAT.
-
-   myCAT is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of
-    the License, or (at your option) any later version.
-
-    myCAT is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with myCAT.  If not, see <http://www.gnu.org/licenses/>.
-
-**********/
-
+/**
+ * ********
+ * Copyright © 2010-2012 Olanto Foundation Geneva
+ *
+ * This file is part of myCAT.
+ *
+ * myCAT is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * myCAT is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with myCAT. If not, see <http://www.gnu.org/licenses/>.
+ *
+ *********
+ */
 package org.olanto.converter;
 
 import java.io.File;
@@ -25,7 +26,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import org.apache.log4j.Logger;
 
-/** construit un convertisseur
+/**
+ * construit un convertisseur
  *
  */
 public class SimpleConverterApplication {
@@ -52,38 +54,38 @@ public class SimpleConverterApplication {
      * @param source source folder or file
      * @param toCovertPath directory
      */
-   public void convertObject(final Document source, final Document target, final String badfilesPath) {
+    public void convertObject(final Document source, final Document target, final String badfilesPath) {
 
         if (source.isFile()) {
             source.setBadfilesPath(badfilesPath);
             convertDocument(source, target);
         } else if (source.isDirectory() && target.isDirectory()) {
-                System.out.println("new folder: " + source.getName());
+            System.out.println("new folder: " + source.getName());
             if (!source.canRead()) {
                 System.out.println("Could not read this folder: " + source.getName());
             } else {  // peut le lire
-               Document[] list = source.listFiles();
-               if (list!=null){
-                for (Document f : list) {
-                    Document newTarget = new Document(target.getAbsolutePath() + File.separator + f.getName());
-                    String newBadfilesPath = badfilesPath.toString();
-                    if (f.isDirectory()) {
-                        newBadfilesPath = badfilesPath + File.separator + f.getName();
-                        newTarget.mkdirs();
-                    } else if (f.isFile()) {
-                        String newTargetPath;
-                        if (KEEP_EXTENSION) {
-                            newTargetPath = newTarget.getAbsolutePath() + '.' + outputFormat;
-                            //System.out.println("target:" + newTargetPath);
-                        } else {
-                            newTargetPath = newTarget.getAbsolutePath().substring(0, newTarget.getAbsolutePath().lastIndexOf('.') + 1) + outputFormat;
-                        }
-                        newTarget = new Document(newTargetPath);
+                Document[] list = source.listFiles();
+                if (list != null) {
+                    for (Document f : list) {
+                        Document newTarget = new Document(target.getAbsolutePath() + File.separator + f.getName());
+                        String newBadfilesPath = badfilesPath.toString();
+                        if (f.isDirectory()) {
+                            newBadfilesPath = badfilesPath + File.separator + f.getName();
+                            newTarget.mkdirs();
+                        } else if (f.isFile()) {
+                            String newTargetPath;
+                            if (KEEP_EXTENSION) {
+                                newTargetPath = newTarget.getAbsolutePath() + '.' + outputFormat;
+                                //System.out.println("target:" + newTargetPath);
+                            } else {
+                                newTargetPath = newTarget.getAbsolutePath().substring(0, newTarget.getAbsolutePath().lastIndexOf('.') + 1) + outputFormat;
+                            }
+                            newTarget = new Document(newTargetPath);
 
+                        }
+                        convertObject(f, newTarget, newBadfilesPath);
                     }
-                    convertObject(f, newTarget, newBadfilesPath);
                 }
-               }
             }
         } else {
             _logger.warn("Could not convert from source: " + source.getAbsolutePath());
@@ -91,9 +93,8 @@ public class SimpleConverterApplication {
         }
     }
 
-
     /**
-     * 
+     *
      * @param source
      * @param target
      */
@@ -148,15 +149,25 @@ public class SimpleConverterApplication {
                 statisticConvertedFiles++;
                 source.removeBadfile();
             } else {
-                _logger.warn("(retry convertion) file: " + source.getName());
-                converterControler.init(source, target, 1);
-                converterControler.run();
-                if (!converterControler.isConverted()) {
-                    _logger.info("(considered as BADFILE) file: " + source.getName());
-                    ConverterReport.badFiles.info(source.getAbsolutePath());
-                    statisticBadfiles++;
-                    source.copyToBadfile();
+                int retryCount = 1;
+                while (retryCount <= iMaxRetry) {
+                    _logger.warn("(retry convertion) file: " + source.getName());
+                    converterControler.init(source, target, retryCount++);
+                    converterControler.run();
+                    if (retryCount==iMaxRetry && !converterControler.isConverted() && (!converterControler.usePlugin() 
+                            || (converterControler.usePlugin() && !ConfigUtil.applyBuiltin(source.getExtention())))) {
+                        _logger.info("(considered as BADFILE) file: " + source.getName());
+                        ConverterReport.badFiles.info(source.getAbsolutePath());
+                        statisticBadfiles++;
+                        source.copyToBadfile();
+                    } else if (converterControler.isConverted()) {
+                        ConverterReport.convertedFiles.info(source.getAbsolutePath());
+                        statisticConvertedFiles++;
+                        source.removeBadfile();
+                        break;
+                    }
                 }
+
 
             }
         } catch (UnsupportedExtentionException e) {
