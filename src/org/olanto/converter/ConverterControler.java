@@ -1,36 +1,40 @@
-/**********
-    Copyright © 2010-2012 Olanto Foundation Geneva
-
-   This file is part of myCAT.
-
-   myCAT is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of
-    the License, or (at your option) any later version.
-
-    myCAT is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with myCAT.  If not, see <http://www.gnu.org/licenses/>.
-
-**********/
-
+/**
+ * ********
+ * Copyright © 2010-2012 Olanto Foundation Geneva
+ *
+ * This file is part of myCAT.
+ *
+ * myCAT is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * myCAT is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with myCAT. If not, see <http://www.gnu.org/licenses/>.
+ *
+ *********
+ */
 package org.olanto.converter;
 
 import org.apache.log4j.Logger;
 
-/** choix de la méthode de conversion adapté à l'extension
+/**
+ * choix de la méthode de conversion adapté à l'extension
  */
 public class ConverterControler {
 
     private final static Logger _logger = Logger.getLogger(ConverterControler.class);
     private boolean success = false;
     private AbstractConverterFactory converterFactory;
+    // default value
     private String outputFormat = Constants.TXT;
-    private int iMaxRetry = 2;
+    // default value
+    private int iMaxRetry = ConfigUtil.maxRetry;
 
     public static ConverterControler getInstance() {
         _logger.debug("Build new Converter");
@@ -46,6 +50,12 @@ public class ConverterControler {
             throws UnsupportedExtentionException {
         _logger.debug("Init converter with file extention: " + source.getExtention());
         Document newTarget = new Document(target.getAbsolutePath());
+
+        if (ConfigUtil.mapping.containsKey(source.getExtention()) && numberOfRetry < iMaxRetry) {
+            if (ConfigUtil.mapping.get(source.getExtention()).size() > 0) {
+                converterFactory = PluginConverterFactory.getInstance();
+            }
+        }
         if (source.getExtention().equalsIgnoreCase(Constants.PDF)) {
             converterFactory = ConverterFactoryPDF.getInstance();
         } else if (source.getExtention().equalsIgnoreCase(Constants.HTML)
