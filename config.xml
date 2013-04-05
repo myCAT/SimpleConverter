@@ -31,13 +31,13 @@
             <ext>
                 <extName>doc</extName>
                 <conv>antiword</conv>
-                <builtin>no</builtin>
+                <builtin>yes</builtin>
             </ext>
             <ext>
                 <extName>pdf</extName>
                 <conv>pdf2txt</conv>
                 <conv>superconverter</conv>
-                <builtin>false</builtin>
+                <builtin>no</builtin>
             </ext>
         </maps>
     </plugins>

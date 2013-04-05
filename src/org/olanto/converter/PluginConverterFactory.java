@@ -43,5 +43,8 @@ public class PluginConverterFactory extends AbstractConverterFactory {
             _logger.info(ex);
         }
         this.success = false;
+        if (target.exists()) {
+            target.delete();
+        }
     }
 }
