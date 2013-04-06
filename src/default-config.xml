@@ -37,7 +37,11 @@
                 <extName>pdf</extName>
                 <conv>pdf2txt</conv>
                 <conv>superconverter</conv>
+<<<<<<< HEAD
                 <builtin>no</builtin>
+=======
+                <builtin>false</builtin>
+>>>>>>> change test value
             </ext>
         </maps>
     </plugins>
