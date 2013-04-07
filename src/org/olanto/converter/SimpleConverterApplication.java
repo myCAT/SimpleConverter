@@ -160,6 +160,10 @@ public class SimpleConverterApplication {
                         ConverterReport.badFiles.info(source.getAbsolutePath());
                         statisticBadfiles++;
                         source.copyToBadfile();
+<<<<<<< HEAD
+=======
+                        break;
+>>>>>>> 08e126c7e8214e3deb4026a99372dca5a4fe8431
                     } else if (converterControler.isConverted()) {
                         ConverterReport.convertedFiles.info(source.getAbsolutePath());
                         statisticConvertedFiles++;
