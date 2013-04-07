@@ -118,11 +118,7 @@ public class ConfigUtil {
                             }
                         }
                         String builtin=element.getElementsByTagName("builtin").item(0).getTextContent();
-<<<<<<< HEAD
-                        if (Boolean.valueOf(builtin)) {
-=======
                         if (valueOfBooleanStr(builtin)) {
->>>>>>> 08e126c7e8214e3deb4026a99372dca5a4fe8431
                             useBuiltin.put(ext, Boolean.TRUE);
                         } else {
                             useBuiltin.put(ext, Boolean.FALSE);
@@ -136,12 +132,7 @@ public class ConfigUtil {
     }
     
     public static Boolean applyBuiltin(String ext){
-<<<<<<< HEAD
-        if (hasPluginForExtension(ext) && Boolean.TRUE.equals(useBuiltin.get(ext))) 
-            return true;
-        else return false;
-    }
-=======
+
         if (hasPluginForExtension(ext) && useBuiltin.get(ext)) 
             return true;
         else return false;
@@ -151,7 +142,7 @@ public class ConfigUtil {
         return (Boolean.TRUE.equals(Boolean.valueOf(str)) || str.equalsIgnoreCase("yes"));
     }
     
->>>>>>> 08e126c7e8214e3deb4026a99372dca5a4fe8431
+
     public static Boolean hasPluginForExtension(String extension){
         ArrayList<ConverterPlugin> pls=mapping.get(extension);
         if (pls!=null && pls.size()>0) return true;
